@@ -4,18 +4,22 @@ import React, { useState, useEffect } from 'react';
 import {
     Home, Wallet, Users, User, Gem, ArrowUpCircle, ArrowDownCircle,
     FileText, ChevronRight, Copy, History, CreditCard, Shield,
-    LogOut, HelpCircle, Share2, Zap, Award, ExternalLink, QrCode, Smartphone, Check, AlertTriangle, TrendingUp, Bell, Menu
+    LogOut, HelpCircle, Share2, Zap, Award, ExternalLink, QrCode, Smartphone, Check, AlertTriangle, TrendingUp, Bell, Menu,
+    Plus,
+    Timer, Calendar, BarChart3, CheckCircle2, Lock
 } from 'lucide-react';
+
+const transactions = [
+    { id: 1, type: 'Depósito USDT', amount: '+500.00', date: '07/02 14:30', status: 'Confirmado', icon: <ArrowUpCircle size={16} className="text-[#F0B90B]" /> },
+    { id: 2, type: 'Rendimiento', amount: '+12.50', date: '06/02 09:15', status: 'Ganancia', icon: <Gem size={16} className="text-[#567C8D]" /> },
+    { id: 3, type: 'Retiro USDT', amount: '-150.00', date: '05/02 18:20', status: 'Procesando', icon: <ArrowDownCircle size={16} className="text-[#F5EFEB]" /> },
+    { id: 4, type: 'Depósito USDT', amount: '+1000.00', date: '01/02 10:00', status: 'Completado', icon: <ArrowUpCircle size={16} className="text-[#F0B90B]" /> },
+    { id: 5, type: 'Rendimiento', amount: '+8.50', date: '01/02 09:15', status: 'Ganancia', icon: <Gem size={16} className="text-[#567C8D]" /> },
+];
 
 export default function App() {
     const [activeTab, setActiveTab] = useState<any>('inicio');
     const [liveAlert, setLiveAlert] = useState<any>(null);
-
-    // PALETA DE COLORES:
-    // Navy: #2F4156 (Fondo principal)
-    // Teal: #567C8D (Tarjetas secundarias / Botones)
-    // Sky Blue: #C8D9E6 (Acentos claros / Bordes)
-    // Beige: #F5EFEB (Texto destacado / Botones claros)
 
     useEffect(() => {
         const generateAlert = () => {
@@ -53,7 +57,7 @@ export default function App() {
     const renderContent = () => {
         switch (activeTab) {
             case 'inicio':
-                return <HomeView planets={planets} />;
+                return <HomeView />;
             case 'wallet':
                 return <WalletView />;
             case 'referidos':
@@ -61,7 +65,7 @@ export default function App() {
             case 'perfil':
                 return <ProfileView />;
             default:
-                return <HomeView planets={planets} />;
+                return <HomeView />;
         }
     };
 
@@ -223,67 +227,169 @@ export default function App() {
 
 /* --- VISTAS --- */
 
-function HomeView({ planets }: any) {
+function HomeView() {
+    // DATOS DEL USUARIO (Simulados)
+    const investmentData = {
+        invested: 1000.00,        // Capital Invertido
+        dailyRate: 3.33,          // % Diario
+        dailyEarnings: 33.30,     // Ganancia en $ por día
+        daysPassed: 12,           // Días transcurridos
+        totalDays: 30,            // Ciclo del mes
+        accumulated: 399.60,      // Ganancia acumulada este mes
+    };
+
+    // Calculamos porcentajes para las barras de progreso
+    const monthlyProgress = (investmentData.daysPassed / investmentData.totalDays) * 100;
+    const todayProgress = 65; // Simulamos que va por el 65% del día actual
+
+    // Historial de los últimos pagos diarios
+    const payoutHistory = [
+        { day: 'Hoy', amount: 'Pendiente...', status: 'processing' },
+        { day: 'Ayer', amount: `+${investmentData.dailyEarnings.toFixed(2)}`, status: 'completed' },
+        { day: '05 Feb', amount: `+${investmentData.dailyEarnings.toFixed(2)}`, status: 'completed' },
+        { day: '04 Feb', amount: `+${investmentData.dailyEarnings.toFixed(2)}`, status: 'completed' },
+    ];
+
     return (
-        <div className="flex flex-col items-center px-4 fade-in w-full h-full justify-center md:justify-start">
-            {/* Sistema Solar - ESCALADO EN DESKTOP */}
-            {/* Añadí md:scale-125 y lg:scale-150 para que se vea grande en pantallas grandes */}
-            <div className="relative w-full max-w-[300px] md:max-w-md h-[380px] mb-8 md:mb-16 md:mt-10 transition-transform md:scale-125 lg:scale-150 origin-center">
-                <div className="absolute top-[100px] left-1/2 -translate-x-1/2 w-32 h-32 rounded-full bg-[#1e2a38] shadow-[0_0_40px_rgba(86,124,141,0.5)] border border-[#C8D9E6]/30 flex flex-col items-center justify-center z-10 text-center">
-                    <div className="absolute inset-0 rounded-full border border-[#F5EFEB]/20 animate-ping opacity-20"></div>
-                    <span className="text-[#F5EFEB] font-bold text-lg drop-shadow-md">1.2%+</span>
-                    <span className="text-[#C8D9E6] text-xs mt-1">Cuota:1000+</span>
+        <div className="flex flex-col gap-5 px-4 fade-in w-full pb-24 md:pb-8">
+
+            {/* 1. HERO: RESUMEN DE CAPITAL ACTIVO */}
+            <div className="relative w-full bg-[#1e2a38] rounded-3xl p-6 border border-[#C8D9E6]/10 shadow-xl mt-4 overflow-hidden">
+                {/* Barra de progreso superior (Ciclo Mensual) */}
+                <div className="absolute top-0 left-0 w-full h-1.5 bg-[#2F4156]">
+                    <div
+                        className="h-full bg-gradient-to-r from-[#00C087] to-[#567C8D]"
+                        style={{ width: `${monthlyProgress}%` }}
+                    ></div>
                 </div>
 
-                {planets.map((planet: any) => (
-                    <div key={planet.id} className={`absolute ${planet.position} flex flex-col items-center justify-center text-center`}>
-                        <div className={`rounded-full bg-gradient-to-br ${planet.color} ${planet.size} shadow-lg shadow-[#2F4156]/50 border border-[#C8D9E6]/30 flex items-center justify-center relative overflow-hidden group transition-transform hover:scale-105 cursor-pointer`}>
-                            <div className="absolute inset-0 bg-black/10 rounded-full"></div>
-                            <div className="absolute -top-2 -left-2 w-1/2 h-1/2 bg-white/20 blur-md rounded-full"></div>
+                <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6 mt-2">
+                    <div>
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="text-[#C8D9E6] text-xs font-bold uppercase tracking-widest flex items-center gap-1">
+                                <Lock size={12} /> Capital en Staking
+                            </span>
                         </div>
-                        <div className="mt-1 text-[10px] font-bold text-[#F5EFEB] drop-shadow-md leading-tight">
-                            <p>{planet.percent}</p>
-                            <p className="text-[#C8D9E6] text-[9px] opacity-80">{planet.quota}</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            {/* Contenedor Inferior: Ganancias + Panel */}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-center md:gap-12 w-full max-w-5xl">
-
-                {/* Ganancias */}
-                <div className="w-full max-w-sm mx-auto relative mt-2 mb-6 text-center md:mx-0 md:flex-1">
-                    <div className="absolute -top-10 right-8 animate-bounce duration-[3000ms]">
-                        <Gem className="w-10 h-10 text-[#C8D9E6] drop-shadow-[0_0_10px_rgba(200,217,230,0.5)]" />
-                        <div className="bg-[#567C8D] text-[#F5EFEB] text-[10px] px-2 py-1 rounded-full absolute -bottom-4 -right-4 whitespace-nowrap backdrop-blur-sm border border-[#C8D9E6]/30 shadow-lg cursor-pointer hover:scale-105 transition-transform">
-                            Click para recoger
+                        <h2 className="text-4xl font-bold text-[#F5EFEB] font-mono tracking-tighter">
+                            ${investmentData.invested.toFixed(2)}
+                        </h2>
+                        <div className="flex items-center gap-3 mt-3">
+                            <div className="bg-[#00C087]/10 px-2 py-1 rounded-lg border border-[#00C087]/20 flex items-center gap-1">
+                                <TrendingUp size={12} className="text-[#00C087]" />
+                                <span className="text-[#00C087] text-xs font-bold">+{investmentData.dailyRate}% Diario</span>
+                            </div>
+                            <span className="text-xs text-[#567C8D]">
+                                Ciclo: {investmentData.daysPassed}/{investmentData.totalDays} días
+                            </span>
                         </div>
                     </div>
 
-                    <div className="relative z-10">
-                        <h3 className="text-[#C8D9E6] text-sm md:text-base mb-1 uppercase tracking-wider">Ganancias de hoy (USDT)</h3>
-                        <p className="text-4xl md:text-5xl font-bold text-[#F5EFEB] drop-shadow-lg font-mono">14.52</p>
-                    </div>
-
-                    <div className="w-full h-px bg-gradient-to-r from-transparent via-[#567C8D] to-transparent mt-4 opacity-50"></div>
-                </div>
-
-                {/* Panel de Control */}
-                <div className="w-full max-w-sm mx-auto md:mx-0 md:flex-1 md:max-w-md">
-                    <div className="grid grid-cols-2 gap-4 mb-6">
-                        <TechCard title="Saldo disponible:" value="1,240u" align="text-center" />
-                        <TechCard title="Balance congelado:" value="53.3u" align="text-center" />
-                    </div>
-
-                    <div className="flex justify-between gap-3 mb-6">
-                        <ActionButton label="Depósito" icon={<ArrowUpCircle size={20} />} color="border-[#567C8D]/50 hover:bg-[#567C8D]/20 text-[#C8D9E6]" />
-                        <ActionButton label="Retirar" icon={<ArrowDownCircle size={20} />} color="border-[#F5EFEB]/30 hover:bg-[#F5EFEB]/10 text-[#F5EFEB]" />
-                        <ActionButton label="Factura" icon={<FileText size={20} />} color="border-[#C8D9E6]/50 hover:bg-[#C8D9E6]/20 text-[#C8D9E6]" />
+                    {/* Ganancia Acumulada del Mes Actual */}
+                    <div className="bg-[#2F4156]/50 p-4 rounded-xl border border-[#C8D9E6]/5 text-right md:text-left min-w-[140px]">
+                        <p className="text-[10px] text-[#C8D9E6] uppercase font-bold mb-1">Ganado este mes</p>
+                        <p className="text-2xl font-bold text-[#F0B90B] font-mono">+${investmentData.accumulated.toFixed(2)}</p>
                     </div>
                 </div>
             </div>
-            <div className="h-24 md:h-12"></div>
+
+            {/* 2. GRID PRINCIPAL: META DIARIA VS META MENSUAL */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                {/* TARJETA A: PROGRESO DE HOY (La emoción diaria) */}
+                <div className="bg-gradient-to-br from-[#1e2a38] to-[#2F4156] border border-[#C8D9E6]/10 rounded-2xl p-5 shadow-lg relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <Timer size={40} className="text-[#F0B90B]" />
+                    </div>
+
+                    <h3 className="text-[#F5EFEB] font-bold text-sm mb-4 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-[#F0B90B] animate-pulse"></span>
+                        Meta de Hoy
+                    </h3>
+
+                    <div className="flex items-end justify-between mb-2">
+                        <span className="text-3xl font-bold text-[#F5EFEB]">${investmentData.dailyEarnings.toFixed(2)}</span>
+                        <span className="text-xs text-[#00C087] font-bold mb-1">En proceso...</span>
+                    </div>
+
+                    {/* Barra de progreso del día */}
+                    <div className="w-full h-3 bg-[#151c24] rounded-full overflow-hidden border border-[#C8D9E6]/5">
+                        <div
+                            className="h-full bg-gradient-to-r from-[#F0B90B] to-[#F6465D] animate-pulse relative"
+                            style={{ width: `${todayProgress}%` }}
+                        >
+                            <div className="absolute right-0 top-0 bottom-0 w-1 bg-white/50 blur-[2px]"></div>
+                        </div>
+                    </div>
+                    <p className="text-[10px] text-[#567C8D] mt-2 text-right">Se acredita a las 00:00 UTC</p>
+                </div>
+
+                {/* TARJETA B: PROGRESO MENSUAL (La meta de retiro) */}
+                <div className="bg-[#1e2a38]/80 border border-[#C8D9E6]/10 rounded-2xl p-5 shadow-lg flex flex-col justify-between">
+                    <div className="flex justify-between items-start">
+                        <h3 className="text-[#F5EFEB] font-bold text-sm flex items-center gap-2">
+                            <Calendar size={16} className="text-[#567C8D]" />
+                            Meta de Retiro
+                        </h3>
+                        <span className="text-[10px] bg-[#567C8D]/20 text-[#C8D9E6] px-2 py-1 rounded-md">
+                            Faltan {investmentData.totalDays - investmentData.daysPassed} días
+                        </span>
+                    </div>
+
+                    <div className="mt-4">
+                        <div className="flex justify-between text-xs mb-2">
+                            <span className="text-[#567C8D]">Inicio</span>
+                            <span className="text-[#F5EFEB] font-bold">{monthlyProgress.toFixed(0)}% Completado</span>
+                            <span className="text-[#567C8D]">Retiro</span>
+                        </div>
+                        <div className="w-full h-2 bg-[#151c24] rounded-full overflow-hidden">
+                            <div
+                                className="h-full bg-[#567C8D]"
+                                style={{ width: `${monthlyProgress}%` }}
+                            ></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* 3. LISTA DE RENDIMIENTOS (HISTORIAL) */}
+            <div className="bg-[#1e2a38]/60 border border-[#C8D9E6]/5 rounded-2xl p-5">
+                <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-[#C8D9E6] text-sm font-bold uppercase tracking-wider">Historial de Pagos</h3>
+                    <BarChart3 size={16} className="text-[#567C8D]" />
+                </div>
+
+                <div className="space-y-3">
+                    {payoutHistory.map((payout, index) => (
+                        <div key={index} className="flex items-center justify-between py-3 border-b border-[#C8D9E6]/5 last:border-0 hover:bg-[#2F4156]/40 px-2 rounded-lg transition-colors">
+                            <div className="flex items-center gap-3">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center border ${payout.status === 'completed' ? 'border-[#00C087]/30 bg-[#00C087]/10' : 'border-[#F0B90B]/30 bg-[#F0B90B]/10'}`}>
+                                    {payout.status === 'completed' ? (
+                                        <CheckCircle2 size={14} className="text-[#00C087]" />
+                                    ) : (
+                                        <Timer size={14} className="text-[#F0B90B] animate-spin-slow" /> // animate-spin-slow clase custom o usar animate-spin
+                                    )}
+                                </div>
+                                <div>
+                                    <p className="text-sm font-bold text-[#F5EFEB]">Rendimiento Diario</p>
+                                    <p className="text-[10px] text-[#567C8D]">{payout.day}</p>
+                                </div>
+                            </div>
+                            <div className="text-right">
+                                <p className={`font-mono font-bold text-sm ${payout.status === 'processing' ? 'text-[#C8D9E6] opacity-50' : 'text-[#00C087]'}`}>
+                                    {payout.amount}
+                                </p>
+                                <p className="text-[9px] text-[#567C8D] uppercase">
+                                    {payout.status === 'processing' ? 'Procesando' : 'Acreditado'}
+                                </p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                <button className="w-full mt-4 py-3 bg-[#2F4156] border border-[#567C8D]/30 text-[#C8D9E6] text-xs font-bold rounded-xl hover:bg-[#567C8D] hover:text-white transition-all">
+                    Ver Historial Completo
+                </button>
+            </div>
         </div>
     );
 }
@@ -297,14 +403,6 @@ function WalletView() {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };
-
-    const transactions = [
-        { id: 1, type: 'Depósito USDT', amount: '+500.00', date: '07/02 14:30', status: 'Confirmado', icon: <ArrowUpCircle size={16} className="text-[#F0B90B]" /> },
-        { id: 2, type: 'Rendimiento', amount: '+12.50', date: '06/02 09:15', status: 'Ganancia', icon: <Gem size={16} className="text-[#567C8D]" /> },
-        { id: 3, type: 'Retiro USDT', amount: '-150.00', date: '05/02 18:20', status: 'Procesando', icon: <ArrowDownCircle size={16} className="text-[#F5EFEB]" /> },
-        { id: 4, type: 'Depósito USDT', amount: '+1000.00', date: '01/02 10:00', status: 'Completado', icon: <ArrowUpCircle size={16} className="text-[#F0B90B]" /> },
-        { id: 5, type: 'Rendimiento', amount: '+8.50', date: '01/02 09:15', status: 'Ganancia', icon: <Gem size={16} className="text-[#567C8D]" /> },
-    ];
 
     return (
         <div className="px-4 pt-4 pb-24 md:pb-8 w-full mx-auto flex flex-col lg:flex-row gap-8 fade-in h-full justify-center">
@@ -614,5 +712,27 @@ function SidebarButton({ active, onClick, icon, label }: any) {
                 {label}
             </span>
         </button>
+    );
+}
+
+function ActionButtonMini({ icon, label, primary }: any) {
+    return (
+        <button className={`flex flex-col items-center justify-center gap-1 py-3 rounded-xl border transition-all active:scale-95 ${primary
+            ? 'bg-[#F5EFEB] border-[#F5EFEB] text-[#2F4156] shadow-[0_0_15px_rgba(245,239,235,0.2)]'
+            : 'bg-[#2F4156]/50 border-[#567C8D]/30 text-[#C8D9E6] hover:bg-[#567C8D]/20 hover:text-[#F5EFEB]'
+            }`}>
+            {icon}
+            <span className="text-[10px] font-bold">{label}</span>
+        </button>
+    );
+}
+
+function MiniStatCard({ label, value, unit, color }: any) {
+    return (
+        <div className="bg-[#1e2a38]/80 border border-[#C8D9E6]/10 p-3 rounded-xl flex flex-col justify-center items-center text-center shadow-sm hover:border-[#567C8D]/30 transition-colors">
+            <span className="text-[9px] text-[#C8D9E6] uppercase font-bold mb-1">{label}</span>
+            <span className={`text-lg font-bold font-mono ${color}`}>{value}</span>
+            <span className="text-[9px] text-[#567C8D]">{unit}</span>
+        </div>
     );
 }
